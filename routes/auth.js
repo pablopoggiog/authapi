@@ -1,10 +1,10 @@
 import express from "express";
 import bcrypt from "bcrypt";
-import { User } from "../models/index.js";
 import jwt from "jsonwebtoken";
+import { User } from "../models/index.js";
+import { tokenSecret } from "../constants/index.js";
 
 const router = express.Router();
-const tokenSecret = "my-secret";
 
 router.get("/login", async (req, res) => {
   const { email, password } = req.body;
