@@ -6,7 +6,24 @@ import jwt from "jsonwebtoken";
 const router = express.Router();
 const tokenSecret = "my-secret";
 
-router.get("/login", (req, res) => {});
+router.get("/login", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) res.status(404).json({ error: "no user with that email found" });
+    else {
+      bcrypt.compare(password, user.password, (error, match) =>
+        error
+          ? res.status(500).json(error)
+          : match
+          ? res.status(200).json({ token: generateToken(user) })
+          : res.status(403).json({ error: "passwords do not match" })
+      );
+    }
+  } catch (e) {
+    res.status(500).json(error);
+  }
+});
 
 router.post("/signup", (req, res) => {
   const { email, password } = req.body;
@@ -14,9 +31,9 @@ router.post("/signup", (req, res) => {
   bcrypt.hash(password, 10, async (error, hash) => {
     if (error) res.status(500).json(error);
     else {
-      const newUser = User({ email, password: hash });
       try {
-        const user = await newUser.save();
+        const newUser = await User({ email, password: hash });
+        const user = newUser.save();
         res.status(200).json({ token: generateToken(user) });
       } catch (e) {
         res.status.json(error);
