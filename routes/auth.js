@@ -2,7 +2,6 @@ import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User } from "../models/index.js";
-import { tokenSecret } from "../constants/index.js";
 
 const router = express.Router();
 
@@ -48,6 +47,6 @@ router.post("/signup", async (req, res) => {
 });
 
 const generateToken = (user) =>
-  jwt.sign({ data: user }, tokenSecret, { expiresIn: "24h" });
+  jwt.sign({ data: user }, process.env.TOKEN_SECRET, { expiresIn: "24h" });
 
 export default router;
