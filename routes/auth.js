@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.get("/login", async (req, res) => {
   const { email, password } = req.body;
+
   try {
     const user = await User.findOne({ email });
     if (!user) res.status(404).json({ error: "no user with that email found" });
@@ -25,8 +26,12 @@ router.get("/login", async (req, res) => {
   }
 });
 
-router.post("/signup", (req, res) => {
+router.post("/signup", async (req, res) => {
   const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (user) res.status(409).json({ error: "the user already exists" });
 
   bcrypt.hash(password, 10, async (error, hash) => {
     if (error) res.status(500).json(error);
